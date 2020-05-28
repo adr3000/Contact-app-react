@@ -1,0 +1,17 @@
+FROM node:13.14.0-alpine as build
+WORKDIR /app
+COPY ./package.json /app
+COPY ./package-lock.json /app
+RUN npm ci --silent
+COPY . /app
+
+# use alpine to serve static files
+FROM node:13.14.0-alpine
+WORKDIR /app
+COPY --from=build /app /app
+
+# expose http and https ports
+EXPOSE 5001
+EXPOSE 5002
+
+CMD ["npm", "start"]
